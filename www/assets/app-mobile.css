@@ -1,83 +1,145 @@
 /* ============================================
-   Extracto — app-mobile.css
-   Loaded ONLY inside the Android app (body.is-app).
-   Turns the desktop sidebar layout into a clean phone app:
-   - top brand bar
-   - bottom tab bar (Scan / Data / Modules / Credit Note ...)
-   - full-width content, touch-friendly
-   Website is untouched.
+   Extracto — app-mobile.css  (app only, body.is-app)
+   A proper phone app: fixed top bar, fixed bottom tabs,
+   CRM-style cards, 3D depth. Website is untouched.
    ============================================ */
+
+body.is-app{ background:var(--bg,#f4f7fb); }
 body.is-app .app{ display:block; }
 
-/* hide the desktop sidebar box; we reuse its nav as a bottom bar */
-body.is-app .sidebar{
-  position:fixed; left:0; right:0; bottom:0; top:auto;
-  width:100%; height:auto; min-height:0;
-  flex-direction:row; align-items:stretch;
-  padding:0; border:0; border-top:1px solid var(--line,#e4e9f0);
-  background:#fff; box-shadow:0 -6px 20px -10px rgba(10,61,145,.25);
-  z-index:900;
-}
-/* brand + user-info + logout move to a top bar instead */
-body.is-app .sidebar .brand{ display:none; }
-body.is-app .sidebar .side-foot{ display:none; }
-
-/* the nav becomes the bottom tab row */
-body.is-app .sidebar .nav{
-  display:flex; flex:1; flex-direction:row; gap:0; padding:0; margin:0;
-  overflow-x:auto; -webkit-overflow-scrolling:touch;
-}
-body.is-app .sidebar .nav .navbtn{
-  flex:1 0 auto; min-width:72px; flex-direction:column; gap:3px;
-  padding:9px 6px calc(9px + env(safe-area-inset-bottom,0px));
-  margin:0; border-radius:0; font-size:11px; font-weight:600;
-  color:var(--ink-soft,#6a7c8f); background:transparent; border:0;
-  justify-content:center; text-align:center; white-space:nowrap;
-}
-body.is-app .sidebar .nav .navbtn .ic{ font-size:19px; line-height:1; }
-body.is-app .sidebar .nav .navbtn.active{
-  color:var(--brand,#0A3D91); background:var(--brand-soft,#eaf2fb);
-}
-/* never show admin modules in the app */
-body.is-app .admin-only{ display:none !important; }
-
-/* top app bar (injected by JS) */
+/* ---------- FIXED TOP BAR ---------- */
 .app-topbar{ display:none; }
 body.is-app .app-topbar{
   display:flex; align-items:center; gap:10px;
-  position:sticky; top:0; z-index:850;
-  padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;
-  background:#fff; border-bottom:1px solid var(--line,#e4e9f0);
+  position:fixed; top:0; left:0; right:0; z-index:950;
+  padding:calc(12px + env(safe-area-inset-top,0px)) 18px 12px;
+  background:linear-gradient(135deg,var(--brand,#0A3D91),var(--brand-2,#1B75BC));
+  box-shadow:0 6px 22px -10px rgba(10,61,145,.55);
 }
-body.is-app .app-topbar img{ height:26px; object-fit:contain; }
+body.is-app .app-topbar img{ display:none; }        /* logo off, name only */
 body.is-app .app-topbar .tb-name{
-  font-family:'Sora',sans-serif; font-weight:800; font-size:18px;
-  color:var(--brand,#0A3D91); letter-spacing:-.02em;
+  font-family:'Sora',sans-serif; font-weight:800; font-size:20px;
+  color:#fff; letter-spacing:-.02em;
 }
-body.is-app .app-topbar .tb-out{
-  margin-left:auto; font-size:13px; font-weight:600; color:var(--ink-soft,#6a7c8f);
-  background:transparent; border:1px solid var(--line,#e4e9f0);
-  border-radius:9px; padding:7px 12px; cursor:pointer;
-}
+body.is-app .app-topbar .tb-out{ display:none; }     /* sign out lives in Profile */
 
-/* content: full width, room for the bottom bar */
+/* ---------- MAIN CONTENT ---------- */
 body.is-app .main{
-  margin:0; padding:14px 14px 92px; width:100%; max-width:none;
+  margin:0; width:100%; max-width:none;
+  padding:calc(66px + env(safe-area-inset-top,0px)) 14px calc(92px + env(safe-area-inset-bottom,0px));
 }
-body.is-app .vhead h1{ font-size:21px; }
-body.is-app .vhead p{ font-size:13px; }
+body.is-app .vhead{ margin-bottom:14px; }
+body.is-app .vhead h1{ font-size:22px; font-family:'Sora',sans-serif; font-weight:800; letter-spacing:-.02em; }
+body.is-app .vhead p{ font-size:13px; color:var(--ink-soft); }
 
-/* panels / cards full width, comfortable spacing */
-body.is-app .panel{ padding:16px; border-radius:14px; margin-bottom:12px; }
-body.is-app .modgrid{ grid-template-columns:1fr; }
-body.is-app .cn-grid{ grid-template-columns:1fr 1fr; }
+/* ---------- FIXED BOTTOM TAB BAR ---------- */
+body.is-app .sidebar{
+  position:fixed; left:0; right:0; bottom:0; top:auto; z-index:950;
+  width:100%; height:auto; min-height:0; flex-direction:row;
+  padding:0; border:0; border-top:1px solid var(--line,#e4e9f0);
+  background:rgba(255,255,255,.98); backdrop-filter:saturate(180%) blur(8px);
+  box-shadow:0 -8px 26px -12px rgba(10,61,145,.3);
+}
+body.is-app .sidebar .brand,
+body.is-app .sidebar .side-foot{ display:none; }
+body.is-app .sidebar .nav{
+  display:flex; flex:1; flex-direction:row; gap:0; padding:0; margin:0;
+}
+body.is-app .sidebar .nav .navbtn{
+  flex:1; flex-direction:column; gap:4px;
+  padding:9px 4px calc(10px + env(safe-area-inset-bottom,0px));
+  margin:0; border-radius:0; font-size:11px; font-weight:600;
+  color:var(--ink-soft,#6a7c8f); background:transparent; border:0;
+  justify-content:center; text-align:center; position:relative;
+  transition:color .15s;
+}
+body.is-app .sidebar .nav .navbtn .ic{ font-size:20px; line-height:1; }
+body.is-app .sidebar .nav .navbtn.active{ color:var(--brand,#0A3D91); }
+body.is-app .sidebar .nav .navbtn.active::before{
+  content:""; position:absolute; top:0; left:50%; transform:translateX(-50%);
+  width:34px; height:3px; border-radius:0 0 4px 4px; background:var(--brand,#0A3D91);
+}
+/* hidden in app */
+body.is-app .admin-only{ display:none !important; }
 
-/* bigger tap targets */
-body.is-app .btn, body.is-app button.btn-primary{ min-height:46px; font-size:15px; }
-body.is-app input, body.is-app select{ font-size:16px; } /* 16px stops iOS/Android zoom */
+/* ---------- CARDS / PANELS (3D) ---------- */
+body.is-app .panel{
+  padding:16px; border-radius:16px; margin-bottom:14px; background:#fff;
+  border:1px solid var(--line-2,#eef2f7);
+  box-shadow:0 1px 2px rgba(15,32,51,.05), 0 12px 28px -18px rgba(10,61,145,.28);
+}
+body.is-app .panel-label{ font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--brand,#0A3D91); }
 
-/* the signature footer sits above the bottom bar */
-body.is-app .app-sign{ margin-bottom:84px; }
+/* module grid -> CRM-style list rows */
+body.is-app .modgrid{ grid-template-columns:1fr; gap:10px; }
+body.is-app .modcard{
+  display:flex; align-items:center; gap:14px; padding:16px; border-radius:16px;
+  background:#fff; border:1px solid var(--line-2,#eef2f7);
+  box-shadow:0 1px 2px rgba(15,32,51,.05), 0 14px 30px -20px rgba(10,61,145,.3);
+  position:relative;
+}
+body.is-app .modcard::after{
+  content:"\203A"; position:absolute; right:16px; top:50%; transform:translateY(-50%);
+  font-size:22px; color:var(--ink-soft,#9fb0c3); font-weight:400;
+}
+body.is-app .modcard .modicon,
+body.is-app .modcard .mod-ic{
+  width:46px; height:46px; border-radius:13px; display:grid; place-items:center;
+  background:var(--brand-soft,#eaf2fb); color:var(--brand,#0A3D91); font-size:20px; flex:0 0 auto;
+}
 
-/* scan reading overlay fills the screen nicely */
+/* credit-note review grid 2-col on phone */
+body.is-app .cn-grid{ grid-template-columns:1fr 1fr; gap:10px; }
+body.is-app .cn-tabs{ display:flex; gap:8px; overflow-x:auto; }
+body.is-app .cn-tab{ white-space:nowrap; }
+
+/* ---------- INPUTS / BUTTONS (touch) ---------- */
+body.is-app .btn, body.is-app button.btn-primary, body.is-app .btn-primary{
+  min-height:48px; font-size:15px; border-radius:13px;
+}
+body.is-app .btn-primary{
+  box-shadow:0 10px 22px -10px rgba(10,61,145,.55);
+}
+body.is-app input, body.is-app select, body.is-app textarea{
+  font-size:16px; border-radius:12px;   /* 16px = no auto-zoom */
+}
+
+/* ---------- PROFILE PAGE ---------- */
+body.is-app #v-profile .prof-top{
+  background:linear-gradient(135deg,var(--brand,#0A3D91),var(--brand-2,#1B75BC));
+  border-radius:20px; padding:26px 20px; color:#fff; text-align:center;
+  box-shadow:0 18px 40px -22px rgba(10,61,145,.6); margin-bottom:16px;
+}
+body.is-app #v-profile .prof-av{
+  width:74px; height:74px; border-radius:50%; margin:0 auto 12px;
+  background:rgba(255,255,255,.18); display:grid; place-items:center;
+  font-family:'Sora',sans-serif; font-weight:800; font-size:30px; color:#fff;
+  border:2px solid rgba(255,255,255,.35);
+}
+body.is-app #v-profile .prof-name{ font-family:'Sora',sans-serif; font-weight:800; font-size:21px; }
+body.is-app #v-profile .prof-sub{ font-size:13px; opacity:.85; margin-top:3px; }
+body.is-app #v-profile .prof-row{
+  display:flex; align-items:center; gap:12px; padding:15px 16px; background:#fff;
+  border:1px solid var(--line-2,#eef2f7); border-radius:14px; margin-bottom:10px;
+  box-shadow:0 10px 24px -20px rgba(10,61,145,.3);
+}
+body.is-app #v-profile .prof-row .pl{ font-size:12px; color:var(--ink-soft); font-weight:600; }
+body.is-app #v-profile .prof-row .pv{ font-size:15px; font-weight:600; color:var(--ink); margin-top:2px; }
+body.is-app #v-profile .prof-signout{
+  width:100%; margin-top:8px; padding:15px; border:0; border-radius:14px;
+  background:var(--danger-soft,#fef3f2); color:var(--danger,#d92d20);
+  font-family:'Sora',sans-serif; font-weight:700; font-size:15px; cursor:pointer;
+}
+
+/* signature footer above bottom bar */
+body.is-app .app-sign{ margin-bottom:96px; font-size:11.5px; }
+
+/* scan reading overlay */
 body.is-app .ai-scan-overlay{ padding:24px; }
+body.is-app .ai-scan-timer{ font-size:28px; }
+
+/* ---------- LOGIN: footer must not jump onto the keyboard ---------- */
+/* handled in login.html via JS (hide on input focus); CSS fallback below */
+@media (max-height:520px){
+  .login-sign, body .sign{ display:none !important; }
+}

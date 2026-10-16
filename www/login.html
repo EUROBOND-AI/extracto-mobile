@@ -78,6 +78,16 @@ async function doLogin(){
 btn.onclick=doLogin;
 document.getElementById('password').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
 document.getElementById('email').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('password').focus()});
+// hide the fixed copyright footer while typing (so the keyboard doesn't push it up)
+(function(){
+  var f=document.querySelector('.sign');
+  function hide(){ if(f) f.style.display='none'; }
+  function show(){ if(f) f.style.display=''; }
+  ['email','password'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el){ el.addEventListener('focus',hide); el.addEventListener('blur',function(){ setTimeout(show,150); }); }
+  });
+})();
 </script>
 </body>
 </html>
