@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Extracto — Eurobond</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/app.css?v=5.4">
+</head>
+<body>
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="assets/eurobond-logo.jpg" class="brand-logo" alt="Eurobond">
+      <div class="brand-name">Extracto</div>
+    </div>
+    <nav class="nav">
+      <button class="navbtn active" data-view="scan"><span class="ic">&#9650;</span> Scan</button>
+      <button class="navbtn" data-view="data"><span class="ic">&#9776;</span> Data</button>
+      <button class="navbtn" data-view="modules"><span class="ic">&#9671;</span> Modules</button>
+      <button class="navbtn" data-view="creditnote" id="nav-creditnote" hidden><span class="ic">&#8377;</span> Credit Note</button>
+      
+      <button class="navbtn admin-only" data-view="admin"><span class="ic">&#9787;</span> Users</button>
+      <button class="navbtn admin-only" data-view="settings"><span class="ic">&#9881;</span> API &amp; Settings</button>
+      
+    </nav>
+    <div class="side-foot">
+      <div class="uinfo">
+        <div class="uav"><span id="uavLetter">U</span></div>
+        <div class="umeta">
+          <div class="uname"><span id="uName">User</span></div>
+          <div class="urole"><span id="uRole">User</span></div>
+        </div>
+      </div>
+      <button class="logout" id="logout">Sign out</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <!-- ===== SCAN ===== -->
+    <section id="v-scan" class="view active">
+      <div class="vhead">
+        <div><h1>Scan documents</h1><p>Upload images, PDFs or spreadsheets. Extract structured data in seconds.</p></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-label">1 &middot; Choose a module</div>
+        <div class="modgrid" id="scanModList"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-label">2 &middot; Add files <span class="hint">Images, PDF, Excel/CSV &middot; bulk supported</span></div>
+        <div class="drop" id="drop">
+          <div class="drop-ic">&#8681;</div>
+          <div class="drop-t">Drop files here or click to browse</div>
+          <div class="drop-s">JPG, PNG, PDF, XLSX, CSV &middot; up to 20 MB each &middot; multiple files at once</div>
+        </div>
+        <input type="file" id="fileInput" multiple accept="image/*,.pdf,.xlsx,.xls,.csv,.tsv" hidden>
+        <div class="filelist" id="filelist"></div>
+        <div class="scan-actions" id="scanActions" hidden>
+          <button class="btn btn-primary" id="scanBtn">Extract data</button>
+          <label class="combine-toggle"><input type="checkbox" id="combineMode"> Combine all files into one record <span class="hint">(e.g. card front + back)</span></label>
+          <span class="scan-status" id="scanStatus"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== DATA ===== -->
+    <section id="v-data" class="view">
+      <div class="vhead">
+        <div><h1>Extracted data</h1><p>Review, edit and export your scanned records.</p></div>
+      </div>
+
+      <div class="filters" id="filters">
+        <select id="fModule" class="fld"><option value="">All modules</option></select>
+        <select id="fUser" class="fld admin-only"><option value="">All users</option></select>
+        <select id="fType" class="fld">
+          <option value="">All types</option><option value="image">Image</option><option value="pdf">PDF</option><option value="sheet">Spreadsheet</option>
+        </select>
+        <input type="date" id="fFrom" class="fld" title="From date">
+        <input type="date" id="fTo" class="fld" title="To date">
+        <input type="text" id="fQ" class="fld grow" placeholder="Search text…">
+        <button class="btn btn-ghost" id="applyFilters">Apply</button>
+        <button class="btn btn-ghost" id="clearFilters">Clear</button>
+        <div class="filters-right">
+          <div class="export-wrap">
+            <button class="btn btn-primary" id="exportBtn">Export &#9662;</button>
+            <div class="export-menu" id="exportMenu" hidden>
+              <button data-fmt="xlsx">Excel (.xlsx)</button>
+              <button data-fmt="csv">CSV (.csv)</button>
+              <button data-fmt="pdf">PDF</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="data-toolbar" id="dataToolbar" hidden>
+        <label class="chk"><input type="checkbox" id="selAll"> Select all</label>
+        <span class="count" id="dataCount"></span>
+        <button class="btn btn-danger btn-sm" id="delSelected" hidden>Delete selected</button>
+      </div>
+
+      <div id="dataArea"><div class="loading">Loading…</div></div>
+    </section>
+
+    <!-- ===== MODULES ===== -->
+    <section id="v-modules" class="view">
+      <div class="vhead">
+        <div><h1>Your modules</h1><p>Define the fields you want extracted. Set up once — reuse every scan.</p></div>
+        <button class="btn btn-primary" id="newModBtn">+ New module</button>
+      </div>
+      <div class="modgrid lg" id="modlist"><div class="loading">Loading…</div></div>
+
+      <div class="modal" id="modModal" hidden>
+        <div class="modal-card wide">
+          <div class="modal-head"><h3 id="modTitle">New module</h3><button class="x" id="modClose">&times;</button></div>
+          <div class="modal-body">
+            <div class="row2">
+              <div><label>Module name</label><input id="modName" placeholder="e.g. Purchase Invoice"></div>
+              <div><label>Short tag (2–3 letters)</label><input id="modIcon" maxlength="3" placeholder="INV"></div>
+            </div>
+            <div class="fieldsec">
+              <label>Header fields <span class="hint">One value per document (Vendor, GST No, Total…)</span></label>
+              <div id="headerFields"></div>
+              <button class="btn btn-ghost btn-sm" id="addHeader">+ Add header field</button>
+            </div>
+            <div class="fieldsec">
+              <label>Line item columns <span class="hint">Repeating table rows — every item is extracted (Item, Qty, Rate…)</span></label>
+              <div id="lineFields"></div>
+              <button class="btn btn-ghost btn-sm" id="addLine">+ Add line column</button>
+            </div>
+          </div>
+          <div class="modal-foot">
+            <button class="btn btn-ghost" id="modCancel">Cancel</button>
+            <button class="btn btn-primary" id="saveMod">Save module</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CREDIT NOTE (SAP) ===== -->
+    <section id="v-creditnote" class="view">
+      <div class="vhead">
+        <div><h1>Credit Note · SAP</h1><p>Scan the credit note, review the SAP fields, then download the uploaders or post directly.</p></div>
+        <div class="cn-tabs">
+          <button class="cn-tab active" data-cn="new">New</button>
+          <button class="cn-tab" data-cn="list">History</button>
+          
+          <button class="cn-tab" data-cn="masters">Masters</button>
+          
+        </div>
+      </div>
+
+      <!-- NEW -->
+      <div id="cn-new" class="cn-panel">
+        <div class="panel">
+          <div class="panel-label">1 &middot; Document type</div>
+          <div class="cn-opts">
+            <label class="radio"><input type="radio" name="cnDoc" value="CN" checked> Credit Note</label>
+            <label class="radio"><input type="radio" name="cnDoc" value="DN"> Debit Note</label>
+            <span class="hint">GST / Non-GST is read from the document automatically.</span>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-label">2 &middot; Upload photos <span class="hint">All parties at once — the app groups each party's pages automatically</span></div>
+          <div class="drop" id="cnDrop">
+            <div class="drop-ic">&#8681;</div>
+            <div class="drop-t">Drop photos here or click to browse</div>
+            <div class="drop-s">Many parties, single or double page &middot; JPG, PNG, PDF</div>
+          </div>
+          <input type="file" id="cnFileInput" multiple accept="image/*,.pdf" hidden>
+          <div class="filelist" id="cnFilelist"></div>
+          <div class="scan-actions" id="cnActions" hidden>
+            <button class="btn btn-primary" id="cnScanBtn">Read documents</button>
+            <span class="scan-status" id="cnStatus"></span>
+          </div>
+        </div>
+        <div id="cnReview"></div>
+      </div>
+
+      <!-- LIST -->
+      <div id="cn-list" class="cn-panel" hidden>
+        <div class="filters">
+          <span class="count" id="cnCount"></span>
+          <div class="filters-right">
+            <div class="export-wrap">
+              <button class="btn btn-ghost" id="cnDlBtn">Download uploaders &#9662;</button>
+              <div class="export-menu" id="cnDlMenu" hidden>
+                <button data-dl="header">Header file (.csv)</button>
+                <button data-dl="row">Row file (.csv)</button>
+                <button data-dl="both">Both files</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cn-bulkbar" id="cnBulkBar" hidden>
+          <label class="bulk-check"><input type="checkbox" id="cnSelAll"> Select all</label>
+          <span class="bulk-count" id="cnSelCount">0 selected</span>
+          <div class="bulk-actions">
+            <button class="btn btn-ghost btn-sm" id="cnBulkHeader">Header (selected)</button>
+            <button class="btn btn-ghost btn-sm" id="cnBulkRow">Row (selected)</button>
+            <button class="btn btn-a btn-sm" id="cnBulkSap">Post to SAP (selected)</button>
+            <button class="btn btn-danger btn-sm" id="cnBulkDel">Delete (selected)</button>
+          </div>
+        </div>
+        <div id="cnListArea"><div class="loading">Loading…</div></div>
+      </div>
+
+      
+      <!-- MASTERS -->
+      <div id="cn-masters" class="cn-panel" hidden>
+        <div class="master-tabs">
+          <button class="mt-tab active" data-mt="gl">Account codes (GL)</button>
+          <button class="mt-tab" data-mt="bp">Locations (BPL)</button>
+          <button class="mt-tab" data-mt="series">Series</button>
+          <button class="mt-tab" data-mt="customer">Customers</button>
+        </div>
+        <div id="masterArea"><div class="loading">Loading…</div></div>
+      </div>
+      
+    </section>
+
+    
+    <!-- ===== ADMIN ===== -->
+    <section id="v-admin" class="view admin-only">
+      <div class="vhead">
+        <div><h1>User management</h1><p>Create and manage team accounts. Each user sees only their own modules and data.</p></div>
+        <button class="btn btn-primary" id="newUserBtn">+ New user</button>
+      </div>
+      <div class="panel nopad">
+        <table class="tbl" id="usersTable"><thead><tr>
+          <th>Name</th><th>Email</th><th>Team</th><th>Role</th><th>Credit Note</th><th>Created</th><th></th>
+        </tr></thead><tbody><tr><td colspan="7" class="loading">Loading…</td></tr></tbody></table>
+      </div>
+
+      <div class="modal" id="userModal" hidden>
+        <div class="modal-card">
+          <div class="modal-head"><h3 id="userTitle">New user</h3><button class="x" id="userClose">&times;</button></div>
+          <div class="modal-body">
+            <label>Full name</label><input id="uName" placeholder="Ravi Kumar">
+            <label>Email</label><input id="uEmail" placeholder="ravi@eurobond.co.in">
+            <label>Team</label><input id="uTeam" placeholder="Accounts">
+            <label>Role</label><select id="uRole"><option value="user">User</option><option value="admin">Administrator</option></select>
+            <label>Password <span class="hint" id="pwHint">Set a password (min 4 chars)</span></label>
+            <input id="uPass" type="text" placeholder="Set password">
+          </div>
+          <div class="modal-foot">
+            <button class="btn btn-ghost" id="userCancel">Cancel</button>
+            <button class="btn btn-primary" id="saveUser">Save user</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== API & SETTINGS (admin only) ===== -->
+    <section id="v-settings" class="view admin-only">
+      <div class="vhead">
+        <div><h1>API &amp; Settings</h1><p>Edit a key here and click Save — it updates instantly everywhere. No code change needed.</p></div>
+      </div>
+      <div id="settingsArea"><div class="loading">Loading…</div></div>
+    </section>
+    
+    <footer class="app-sign">Copyright &copy; 2026 <b>Extracto</b> &middot; Developed and Designed by <b>Karthik G</b></footer>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>var IS_ADMIN=false; var MY_NAME='';</script>
+<script src="assets/app-config.js"></script>
+<script>
+// App gate: in the native app, require a saved token; redirect to login if missing.
+if(window.IS_NATIVE_APP && (!window.getToken || !window.getToken())){ location.href='login.html'; }
+// Fetch who we are, set admin flag + name, hide admin-only parts for non-admins.
+(async function(){
+  try{
+    var r=await fetch(window.apiUrl('auth.php?action=me'));
+    if(r.status===401){ location.href=(window.loginPage?window.loginPage():'login.php'); return; }
+    var d=await r.json();
+    if(d&&d.ok){
+      IS_ADMIN=(d.role==='admin'); MY_NAME=d.name||'';
+      var L=document.getElementById('uavLetter'); if(L)L.textContent=(MY_NAME||'U').charAt(0).toUpperCase();
+      var N=document.getElementById('uName'); if(N)N.textContent=MY_NAME||'User';
+      var R=document.getElementById('uRole'); if(R)R.textContent=IS_ADMIN?'Administrator':'User';
+      if(!IS_ADMIN){ document.querySelectorAll('.admin-only').forEach(function(e){e.style.display='none';}); }
+    }
+  }catch(e){}
+})();
+</script>
+<script src="assets/app.js?v=5.4"></script>
+<script src="assets/creditnote.js?v=5.4"></script>
+<div class="viewer-overlay" id="viewerOverlay" hidden>
+  <button class="viewer-close" id="viewerClose" aria-label="Close">&times;</button>
+  <button class="viewer-nav prev" id="viewerPrev" aria-label="Previous">&#8249;</button>
+  <div class="viewer-stage"><div class="viewer-body" id="viewerBody"></div><div class="viewer-cap" id="viewerCap"></div></div>
+  <button class="viewer-nav next" id="viewerNext" aria-label="Next">&#8250;</button>
+</div>
+<div class="ai-scan-overlay" id="aiScanOverlay" hidden>
+  <div class="ai-scan-box">
+    <div class="ai-scan-bars"><span></span><span></span><span></span><span></span></div>
+    <div class="ai-scan-text" id="aiScanText">Reading your documents…</div>
+    <div class="ai-scan-timer" id="aiScanTimer">00:00:00</div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  var vc=document.getElementById('viewerClose');if(vc)vc.onclick=closeViewer;
+  var vo=document.getElementById('viewerOverlay');if(vo)vo.addEventListener('mousedown',function(e){if(e.target===vo)closeViewer()});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'){var v=document.getElementById('viewerOverlay');if(v&&!v.hidden)closeViewer()}});
+});
+</script>
+</body>
+</html>

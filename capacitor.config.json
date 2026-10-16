@@ -1,0 +1,11 @@
+{
+  "appId": "in.co.eurobond.extracto",
+  "appName": "Extracto",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false
+  }
+}
