@@ -2,13 +2,20 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Extracto — Eurobond</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/app.css?v=5.4">
+<link rel="stylesheet" href="assets/app-mobile.css?v=5.4">
 </head>
 <body>
+<!-- top app bar (shown only inside the app) -->
+<div class="app-topbar">
+  <img src="assets/eurobond-logo.jpg" alt="Eurobond">
+  <span class="tb-name">Extracto</span>
+  <button class="tb-out" id="appLogout">Sign out</button>
+</div>
 <div class="app">
   <!-- Sidebar -->
   <aside class="sidebar">
@@ -271,8 +278,15 @@
 <script>var IS_ADMIN=false; var MY_NAME='';</script>
 <script src="assets/app-config.js"></script>
 <script>
+// Mark body as app so the mobile CSS + top bar apply
+if(window.IS_NATIVE_APP){ document.body.classList.add('is-app'); }
 // App gate: in the native app, require a saved token; redirect to login if missing.
 if(window.IS_NATIVE_APP && (!window.getToken || !window.getToken())){ location.href='login.html'; }
+// top-bar sign out (app)
+(function(){ var b=document.getElementById('appLogout'); if(b) b.onclick=async function(){
+  try{ await fetch(window.apiUrl('auth.php?action=logout')); }catch(e){}
+  window.setToken&&window.setToken(''); location.href='login.html';
+}; })();
 // Fetch who we are, set admin flag + name, hide admin-only parts for non-admins.
 (async function(){
   try{

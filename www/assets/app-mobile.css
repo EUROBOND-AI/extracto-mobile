@@ -1,0 +1,83 @@
+/* ============================================
+   Extracto — app-mobile.css
+   Loaded ONLY inside the Android app (body.is-app).
+   Turns the desktop sidebar layout into a clean phone app:
+   - top brand bar
+   - bottom tab bar (Scan / Data / Modules / Credit Note ...)
+   - full-width content, touch-friendly
+   Website is untouched.
+   ============================================ */
+body.is-app .app{ display:block; }
+
+/* hide the desktop sidebar box; we reuse its nav as a bottom bar */
+body.is-app .sidebar{
+  position:fixed; left:0; right:0; bottom:0; top:auto;
+  width:100%; height:auto; min-height:0;
+  flex-direction:row; align-items:stretch;
+  padding:0; border:0; border-top:1px solid var(--line,#e4e9f0);
+  background:#fff; box-shadow:0 -6px 20px -10px rgba(10,61,145,.25);
+  z-index:900;
+}
+/* brand + user-info + logout move to a top bar instead */
+body.is-app .sidebar .brand{ display:none; }
+body.is-app .sidebar .side-foot{ display:none; }
+
+/* the nav becomes the bottom tab row */
+body.is-app .sidebar .nav{
+  display:flex; flex:1; flex-direction:row; gap:0; padding:0; margin:0;
+  overflow-x:auto; -webkit-overflow-scrolling:touch;
+}
+body.is-app .sidebar .nav .navbtn{
+  flex:1 0 auto; min-width:72px; flex-direction:column; gap:3px;
+  padding:9px 6px calc(9px + env(safe-area-inset-bottom,0px));
+  margin:0; border-radius:0; font-size:11px; font-weight:600;
+  color:var(--ink-soft,#6a7c8f); background:transparent; border:0;
+  justify-content:center; text-align:center; white-space:nowrap;
+}
+body.is-app .sidebar .nav .navbtn .ic{ font-size:19px; line-height:1; }
+body.is-app .sidebar .nav .navbtn.active{
+  color:var(--brand,#0A3D91); background:var(--brand-soft,#eaf2fb);
+}
+/* never show admin modules in the app */
+body.is-app .admin-only{ display:none !important; }
+
+/* top app bar (injected by JS) */
+.app-topbar{ display:none; }
+body.is-app .app-topbar{
+  display:flex; align-items:center; gap:10px;
+  position:sticky; top:0; z-index:850;
+  padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;
+  background:#fff; border-bottom:1px solid var(--line,#e4e9f0);
+}
+body.is-app .app-topbar img{ height:26px; object-fit:contain; }
+body.is-app .app-topbar .tb-name{
+  font-family:'Sora',sans-serif; font-weight:800; font-size:18px;
+  color:var(--brand,#0A3D91); letter-spacing:-.02em;
+}
+body.is-app .app-topbar .tb-out{
+  margin-left:auto; font-size:13px; font-weight:600; color:var(--ink-soft,#6a7c8f);
+  background:transparent; border:1px solid var(--line,#e4e9f0);
+  border-radius:9px; padding:7px 12px; cursor:pointer;
+}
+
+/* content: full width, room for the bottom bar */
+body.is-app .main{
+  margin:0; padding:14px 14px 92px; width:100%; max-width:none;
+}
+body.is-app .vhead h1{ font-size:21px; }
+body.is-app .vhead p{ font-size:13px; }
+
+/* panels / cards full width, comfortable spacing */
+body.is-app .panel{ padding:16px; border-radius:14px; margin-bottom:12px; }
+body.is-app .modgrid{ grid-template-columns:1fr; }
+body.is-app .cn-grid{ grid-template-columns:1fr 1fr; }
+
+/* bigger tap targets */
+body.is-app .btn, body.is-app button.btn-primary{ min-height:46px; font-size:15px; }
+body.is-app input, body.is-app select{ font-size:16px; } /* 16px stops iOS/Android zoom */
+
+/* the signature footer sits above the bottom bar */
+body.is-app .app-sign{ margin-bottom:84px; }
+
+/* scan reading overlay fills the screen nicely */
+body.is-app .ai-scan-overlay{ padding:24px; }
