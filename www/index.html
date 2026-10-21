@@ -7,15 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/app.css?v=5.4">
-<link rel="stylesheet" href="assets/app-mobile.css?v=5.4">
+<link rel="stylesheet" href="assets/app-mobile.css?v=6.0">
 </head>
 <body>
-<!-- top app bar (shown only inside the app) -->
-<div class="app-topbar">
-  <img src="assets/eurobond-logo.jpg" alt="Eurobond">
-  <span class="tb-name">Extracto</span>
-  <button class="tb-out" id="appLogout">Sign out</button>
-</div>
 <div class="app">
   <!-- Sidebar -->
   <aside class="sidebar">
@@ -277,103 +271,17 @@
 
 <script>var IS_ADMIN=false; var MY_NAME='';</script>
 <script src="assets/app-config.js"></script>
+<script src="assets/app-shell.js?v=6.0"></script>
 <script>
-// Mark body as app so the mobile CSS + top bar apply
-if(window.IS_NATIVE_APP){ document.body.classList.add('is-app'); }
 // App gate: in the native app, require a saved token; redirect to login if missing.
 if(window.IS_NATIVE_APP && (!window.getToken || !window.getToken())){ location.href='login.html'; }
-
-// ---- PHONE APP SHELL: bottom tabs = Scan / Data / Modules / Profile ----
-if(window.IS_NATIVE_APP){
-  document.addEventListener('DOMContentLoaded', function(){
-    var nav=document.querySelector('.sidebar .nav');
-    var main=document.querySelector('.main');
-    if(!nav||!main) return;
-
-    // 1) Credit Note is a module -> hide its bottom tab (opened from Modules)
-    var cnBtn=document.getElementById('nav-creditnote'); if(cnBtn) cnBtn.style.display='none';
-
-    // 2) give the kept tabs clean phone labels/icons
-    function setTab(view,label,icon){
-      var b=nav.querySelector('.navbtn[data-view="'+view+'"]');
-      if(b){ b.innerHTML='<span class="ic">'+icon+'</span> '+label; }
-      return b;
-    }
-    setTab('scan','Scan','&#128247;');       // camera
-    setTab('data','Data','&#9776;');
-    setTab('modules','Modules','&#9638;');
-
-    // 3) add a Profile tab + section
-    var prof=document.createElement('button');
-    prof.className='navbtn'; prof.setAttribute('data-view','profile');
-    prof.innerHTML='<span class="ic">&#128100;</span> Profile';
-    nav.appendChild(prof);
-
-    var sec=document.createElement('section');
-    sec.id='v-profile'; sec.className='view';
-    sec.innerHTML=
-      '<div class="prof-top"><div class="prof-av" id="pfAv">U</div>'+
-      '<div class="prof-name" id="pfName">User</div>'+
-      '<div class="prof-sub" id="pfSub">Extracto</div></div>'+
-      '<div class="prof-row"><div><div class="pl">Name</div><div class="pv" id="pfN2">—</div></div></div>'+
-      '<div class="prof-row"><div><div class="pl">Email</div><div class="pv" id="pfEmail">—</div></div></div>'+
-      '<div class="prof-row"><div><div class="pl">Role</div><div class="pv" id="pfRole">—</div></div></div>'+
-      '<button class="prof-signout" id="pfOut">Sign out</button>';
-    main.appendChild(sec);
-
-    // wire the Profile tab (same switching behaviour as other navbtns)
-    prof.onclick=function(){
-      document.querySelectorAll('.navbtn').forEach(function(x){x.classList.remove('active')});
-      prof.classList.add('active');
-      document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active')});
-      sec.classList.add('active');
-    };
-    document.getElementById('pfOut').onclick=async function(){
-      try{ await fetch(window.apiUrl('auth.php?action=logout')); }catch(e){}
-      window.setToken&&window.setToken(''); location.href='login.html';
-    };
-
-    // 4) add a Credit Note card inside the Modules view (since it's a module)
-    var modGrid=document.getElementById('modlist');
-    var modView=document.getElementById('v-modules');
-    if(modView){
-      // show a Credit Note launcher at the top of Modules
-      var cnCard=document.createElement('div');
-      cnCard.className='modgrid'; cnCard.style.marginBottom='12px';
-      cnCard.innerHTML='<div class="modcard" id="openCN"><div class="mod-ic">&#8377;</div>'+
-        '<div><div style="font-family:Sora,sans-serif;font-weight:700;font-size:16px">Credit Note · SAP</div>'+
-        '<div style="font-size:12px;color:var(--ink-soft)">Scan, review, build SAP uploaders</div></div></div>';
-      var vh=modView.querySelector('.vhead');
-      if(vh) vh.insertAdjacentElement('afterend', cnCard);
-      var openCN=document.getElementById('openCN');
-      if(openCN) openCN.onclick=function(){
-        document.querySelectorAll('.navbtn').forEach(function(x){x.classList.remove('active')});
-        document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active')});
-        var cv=document.getElementById('v-creditnote'); if(cv) cv.classList.add('active');
-        // keep Modules tab highlighted
-        var mb=nav.querySelector('.navbtn[data-view="modules"]'); if(mb) mb.classList.add('active');
-      };
-    }
-  });
-}
-// Fetch who we are, set admin flag + name, hide admin-only parts for non-admins.
+// who am I -> admin flag (used by app.js filters)
 (async function(){
   try{
     var r=await fetch(window.apiUrl('auth.php?action=me'));
     if(r.status===401){ location.href=(window.loginPage?window.loginPage():'login.php'); return; }
     var d=await r.json();
-    if(d&&d.ok){
-      IS_ADMIN=(d.role==='admin'); MY_NAME=d.name||'';
-      var L=document.getElementById('uavLetter'); if(L)L.textContent=(MY_NAME||'U').charAt(0).toUpperCase();
-      var N=document.getElementById('uName'); if(N)N.textContent=MY_NAME||'User';
-      var R=document.getElementById('uRole'); if(R)R.textContent=IS_ADMIN?'Administrator':'User';
-      if(!IS_ADMIN){ document.querySelectorAll('.admin-only').forEach(function(e){e.style.display='none';}); }
-      // fill the app Profile page
-      var ltr=(MY_NAME||'U').charAt(0).toUpperCase();
-      var set=function(id,val){var e=document.getElementById(id); if(e)e.textContent=val;};
-      set('pfAv',ltr); set('pfName',MY_NAME||'User'); set('pfSub',d.email||'Extracto');
-      set('pfN2',MY_NAME||'—'); set('pfEmail',d.email||'—'); set('pfRole',IS_ADMIN?'Administrator':'User');
-    }
+    if(d&&d.ok){ IS_ADMIN=(d.role==='admin'); MY_NAME=d.name||''; }
   }catch(e){}
 })();
 </script>

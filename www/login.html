@@ -5,89 +5,74 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Sign in — Extracto</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --brand:#0A3D91; --brand-2:#1B75BC; --brand-3:#3a92d6; --brand-soft:#eaf2fb;
-    --ink:#0f2033; --ink-soft:#5a6b7e; --line:#dbe6f2; --bg:#eef3fa;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Inter',system-ui,sans-serif;min-height:100vh;color:var(--ink);
-    background:radial-gradient(1100px 620px at 12% -8%,#dce9fb 0,transparent 58%),
-               radial-gradient(1000px 700px at 112% 112%,#d3e4f6 0,transparent 55%),var(--bg);
-    display:grid;place-items:center;padding:24px}
-  .card{width:100%;max-width:420px;background:#fff;border:1px solid var(--line);
-    border-radius:20px;box-shadow:0 1px 2px rgba(10,61,145,.04),0 28px 64px -24px rgba(10,61,145,.3);
-    padding:40px 36px;position:relative;overflow:hidden}
-  .card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;
-    background:linear-gradient(90deg,var(--brand),var(--brand-2),var(--brand-3))}
-  .brand-row{display:flex;flex-direction:column;align-items:center;margin-bottom:26px}
-  .logo{height:42px;object-fit:contain;margin-bottom:16px}
-  .name{font-family:'Sora',sans-serif;font-weight:800;font-size:26px;letter-spacing:-.03em;color:var(--brand)}
-  .tag{font-size:13px;color:var(--ink-soft);margin-top:4px;font-weight:500}
-  .tag b{color:var(--brand-2)}
-  label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin:16px 0 6px;letter-spacing:.02em}
-  input{width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:11px;font-size:15px;font-family:inherit;transition:.15s;background:#fbfcfe}
-  input:focus{outline:none;border-color:var(--brand-2);box-shadow:0 0 0 4px rgba(27,117,188,.12);background:#fff}
-  button{width:100%;margin-top:26px;padding:14px;border:0;border-radius:12px;font-size:15px;font-weight:700;font-family:'Sora',sans-serif;cursor:pointer;color:#fff;
-    background:linear-gradient(135deg,var(--brand),var(--brand-2));box-shadow:0 8px 20px -8px rgba(10,61,145,.55);transition:.15s}
-  button:hover{transform:translateY(-1px);box-shadow:0 12px 26px -8px rgba(10,61,145,.65)}
-  button:active{transform:translateY(0)}
-  button:disabled{opacity:.65;cursor:not-allowed;transform:none}
-  .err{background:#fef2f2;color:#b42318;border:1px solid #fecaca;border-radius:10px;padding:11px 13px;font-size:13px;margin-top:18px;display:none}
-  .foot{text-align:center;font-size:12px;color:var(--ink-soft);margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
-  .foot b{color:var(--brand)}
-  .sign{position:fixed;left:0;right:0;bottom:0;padding:14px;text-align:center;font-size:12.5px;color:var(--ink-soft)}
-  .sign b{color:var(--ink)}
+  :root{ --blue:#0A3D91; --ink:#0f1f33; --soft:#6b7a8c; --line:#e3e9f2; }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:#fff;display:flex;flex-direction:column}
+  .hero{background:linear-gradient(160deg,var(--blue),#08307a);color:#fff;
+    padding:calc(56px + env(safe-area-inset-top,0px)) 28px 44px;border-radius:0 0 30px 30px}
+  .word{font:800 38px 'Sora',sans-serif;letter-spacing:-.03em}
+  .tag{margin-top:8px;font-size:15px;opacity:.85;line-height:1.5}
+  .form{flex:1;padding:30px 24px 24px}
+  h2{font:700 20px 'Sora',sans-serif;margin-bottom:4px}
+  .hint{font-size:14px;color:var(--soft);margin-bottom:22px}
+  label{display:block;font-size:13px;font-weight:600;color:var(--soft);margin:14px 0 7px}
+  input{width:100%;height:52px;padding:0 16px;border:1.5px solid var(--line);border-radius:14px;
+    font:500 16px 'Inter',sans-serif;background:#f7f9fc;color:var(--ink)}
+  input:focus{outline:none;border-color:var(--blue);background:#fff}
+  button{width:100%;height:54px;margin-top:26px;border:0;border-radius:14px;background:var(--blue);
+    color:#fff;font:700 16px 'Sora',sans-serif;cursor:pointer}
+  button:active{opacity:.9}
+  button:disabled{opacity:.6}
+  .err{display:none;margin-top:16px;padding:12px 14px;border-radius:12px;background:#fdeeec;color:#b42318;font-size:14px}
+  .foot{text-align:center;font-size:12px;color:var(--soft);padding:14px 20px calc(16px + env(safe-area-inset-bottom,0px))}
+  .foot b{color:var(--ink)}
+  body.typing .foot{display:none}
 </style>
 </head>
 <body>
-<div class="card">
-  <div class="brand-row">
-    <img src="assets/eurobond-logo.jpg" class="logo" alt="Eurobond">
-    <div class="name">Extracto</div>
-    <div class="tag">AI that reads documents <b>at the speed of thought</b></div>
+  <div class="hero">
+    <div class="word">Extracto</div>
+    <div class="tag">Scan any document.<br>The AI does the rest.</div>
   </div>
-  <label>Email address</label>
-  <input type="email" id="email" placeholder="you@eurobond.co.in" autocomplete="username">
-  <label>Password</label>
-  <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password">
-  <div class="err" id="err"></div>
-  <button id="loginBtn">Sign in</button>
-  <div class="foot">Document intelligence for <b>Eurobond</b></div>
-</div>
-<footer class="sign">Copyright &copy; 2026 <b>Extracto</b> &middot; Developed and Designed by <b>Karthik G</b></footer>
+  <div class="form">
+    <h2>Sign in</h2>
+    <div class="hint">Use your Eurobond account</div>
+    <label for="email">Email address</label>
+    <input type="email" id="email" placeholder="you@eurobond.co.in" autocomplete="username" inputmode="email">
+    <label for="password">Password</label>
+    <input type="password" id="password" placeholder="Your password" autocomplete="current-password">
+    <div class="err" id="err"></div>
+    <button id="loginBtn">Sign in</button>
+  </div>
+  <div class="foot">Copyright &copy; 2026 <b>Extracto</b> &middot; Developed and Designed by <b>Karthik G</b></div>
 
 <script src="assets/app-config.js"></script>
 <script>
-const btn=document.getElementById('loginBtn'),err=document.getElementById('err');
-// already logged in? go straight in
+var btn=document.getElementById('loginBtn'), err=document.getElementById('err');
 if(window.getToken && window.getToken()) location.href='index.html';
 async function doLogin(){
-  err.style.display='none';btn.disabled=true;btn.textContent='Signing in…';
+  err.style.display='none'; btn.disabled=true; btn.textContent='Signing in…';
   try{
-    const r=await fetch(window.apiUrl('auth.php?action=login'),{method:'POST',
-      headers:{'Content-Type':'application/json'},
+    var r=await fetch(window.apiUrl('auth.php?action=login'),{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({email:document.getElementById('email').value.trim(),password:document.getElementById('password').value})});
-    const d=await r.json();
-    if(d.ok){ if(d.token && window.setToken) window.setToken(d.token); location.href='index.html'; }
-    else{err.textContent=d.error||'Sign in failed';err.style.display='block'}
-  }catch(e){err.textContent='Server error. Please try again.';err.style.display='block'}
-  btn.disabled=false;btn.textContent='Sign in';
+    var d=await r.json();
+    if(d.ok){ if(d.token&&window.setToken) window.setToken(d.token); location.href='index.html'; return; }
+    err.textContent=d.error||'Sign in failed'; err.style.display='block';
+  }catch(e){ err.textContent='Cannot reach the server. Check your internet and try again.'; err.style.display='block'; }
+  btn.disabled=false; btn.textContent='Sign in';
 }
 btn.onclick=doLogin;
-document.getElementById('password').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
-document.getElementById('email').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('password').focus()});
-// hide the fixed copyright footer while typing (so the keyboard doesn't push it up)
-(function(){
-  var f=document.querySelector('.sign');
-  function hide(){ if(f) f.style.display='none'; }
-  function show(){ if(f) f.style.display=''; }
-  ['email','password'].forEach(function(id){
-    var el=document.getElementById(id);
-    if(el){ el.addEventListener('focus',hide); el.addEventListener('blur',function(){ setTimeout(show,150); }); }
-  });
-})();
+document.getElementById('password').addEventListener('keydown',function(e){ if(e.key==='Enter') doLogin(); });
+document.getElementById('email').addEventListener('keydown',function(e){ if(e.key==='Enter') document.getElementById('password').focus(); });
+// keep the footer off the keyboard
+['email','password'].forEach(function(id){
+  var el=document.getElementById(id);
+  el.addEventListener('focus',function(){ document.body.classList.add('typing'); });
+  el.addEventListener('blur',function(){ setTimeout(function(){ document.body.classList.remove('typing'); },150); });
+});
 </script>
 </body>
 </html>
