@@ -40,28 +40,27 @@
       '<button class="ax-ib" id="axRefresh" aria-label="Refresh">'+ic('refresh')+'</button>';
     document.body.insertBefore(top, document.body.firstChild);
 
-    // ---------- home view ----------
+    // ---------- home view (own design) ----------
     var home=document.createElement('section'); home.id='v-home'; home.className='view';
     home.innerHTML=
-      '<div class="ax-hero">'+
-        '<div class="ax-hi">Good day</div>'+
-        '<div class="ax-name" id="axName">&nbsp;</div>'+
-        '<div class="ax-sub" id="axSub">&nbsp;</div>'+
-        '<button class="ax-cta" id="axScanNow"><span class="ax-cta-ic">'+ic('scan')+'</span>Scan a document<span class="ax-cta-arr">'+ic('chev')+'</span></button>'+
-      '</div>'+
-      '<div class="ax-stats">'+
-        stat('axS1',ic('scan'),'Scans','today')+
-        stat('axS2',ic('rupee'),'Credit notes','this month')+
-        stat('axS3',ic('send'),'Pending SAP','to post')+
-        stat('axS4',ic('grid'),'Modules','ready to use')+
-      '</div>'+
+      '<div class="hx-head"><div><div class="ax-hi">Welcome</div><div class="hx-name" id="axName">&nbsp;</div>'+
+      '<div class="hx-date" id="axSub">&nbsp;</div></div><button class="hx-av" data-go="profile" id="axHAv">U</button></div>'+
+      '<button class="hx-scan" id="axScanNow"><div class="hx-scan-t"><b>Scan documents</b>'+
+      '<span>Photo, PDF or Excel — the AI fills every field for you</span></div>'+
+      '<span class="hx-scan-btn">'+ic('scan')+'</span></button>'+
+      '<div class="hx-month"><div class="hx-m"><b id="axS1">0</b><span>Scans today</span></div>'+
+      '<div class="hx-m"><b id="axS2">0</b><span>Credit notes</span></div>'+
+      '<div class="hx-m"><b id="axS3">0</b><span>Pending SAP</span></div></div>'+
+      '<div class="ax-sec hx-sec"><span>Your modules</span><button data-go="appmods">See all</button></div>'+
+      '<div class="hx-mods" id="axHomeMods"></div>'+
       '<div class="ax-sec">Recent activity</div>'+
       '<div class="ax-list" id="axRecent"><div class="ax-empty">Nothing yet — scan your first document.</div></div>';
     main.insertBefore(home, main.firstChild);
-    function stat(id,icon,label,sub){
-      return '<div class="ax-stat"><div class="ax-stat-h">'+icon+'<span>'+label+'</span></div>'+
-             '<div class="ax-stat-n" id="'+id+'">0</div><div class="ax-stat-s">'+sub+'</div></div>';
-    }
+
+    // ---------- modules view ----------
+    var mv=document.createElement('section'); mv.id='v-appmods'; mv.className='view';
+    mv.innerHTML='<div class="vhead"><h1>Modules</h1><p>Pick a module, then scan.</p></div><div class="hx-mods hx-mods-all" id="axAllMods"></div>';
+    main.appendChild(mv);
 
     // ---------- profile view ----------
     var prof=document.createElement('section'); prof.id='v-profile'; prof.className='view';
@@ -80,7 +79,7 @@
 
     // ---------- bottom tabs ----------
     var tabs=document.createElement('nav'); tabs.className='ax-tabs';
-    tabs.innerHTML=tab('home','home','Home')+tab('scan','scan','Scan')+tab('data','data','Data')+tab('profile','user','Profile');
+    tabs.innerHTML=tab('home','home','Home')+tab('scan','scan','Scan')+tab('appmods','grid','Modules')+tab('profile','user','Profile');
     document.body.appendChild(tabs);
     function tab(v,icon,label){return '<button class="ax-tab" data-go="'+v+'">'+ic(icon)+'<span>'+label+'</span></button>';}
 
@@ -93,7 +92,7 @@
       '<button class="ax-dx" id="axClose">'+ic('x')+'</button></div>'+
       '<div class="ax-dbody">'+
         '<div class="ax-dsec">Main</div>'+
-        drow('home','home','Home')+drow('scan','scan','Scan documents')+drow('data','data','Data & exports')+
+        drow('home','home','Home')+drow('scan','scan','Scan documents')+drow('appmods','grid','All modules')+
         '<div class="ax-dsec">Modules</div><div id="axDMods"></div>'+
         '<div class="ax-dsec">Account</div>'+
         drow('profile','user','Profile')+
@@ -112,10 +111,9 @@
     function go(v){
       document.querySelectorAll('.view').forEach(function(x){x.classList.remove('active');});
       var el=document.getElementById('v-'+v); if(el) el.classList.add('active');
-      var tabV=(v==='creditnote')?'scan':v;
+      var tabV=(v==='creditnote')?'appmods':v;
       document.querySelectorAll('.ax-tab').forEach(function(t){t.classList.toggle('active',t.dataset.go===tabV);});
       try{
-        if(v==='data' && typeof loadData==='function') loadData();
         if(v==='home') loadHome();
       }catch(e){}
       window.scrollTo(0,0); closeDrawer();
@@ -148,10 +146,10 @@
         var d=await r.json(); if(!d||!d.ok) return;
         ME={name:d.name||'',role:d.role==='admin'?'Administrator':'User',email:d.email||''};
         var h=new Date().getHours(), g=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
-        set('.ax-hi',g,true);
-        set('axName',ME.name); set('axSub',fmtDate()+' · '+ME.role);
+        set('.ax-hi',g,true); 
+        set('axName',ME.name); set('axSub',fmtDate());
         set('axDName',ME.name); set('axDRole',ME.email||ME.role);
-        set('axAv',(ME.name||'U').charAt(0).toUpperCase()); set('axPName',ME.name); set('axPRole',ME.role);
+        set('axAv',(ME.name||'U').charAt(0).toUpperCase()); set('axHAv',(ME.name||'U').charAt(0).toUpperCase()); set('axPName',ME.name); set('axPRole',ME.role);
         set('axPN',ME.name||'—'); set('axPE',ME.email||'—'); set('axPR',ME.role);
       }catch(e){}
     }
@@ -175,6 +173,17 @@
         b.onclick=function(){ pickModule(b.dataset.mod); };
       });
       var cn=box.querySelector('[data-cn]'); if(cn) cn.onclick=function(){ go('creditnote'); };
+      var tiles='';
+      if(HAS_CN) tiles+='<button class="hx-tile" data-cn="1"><span class="hx-ti">'+ic('rupee')+'</span><b>Credit Note</b><small>SAP uploader</small></button>';
+      MODS.forEach(function(m){
+        tiles+='<button class="hx-tile" data-mod="'+m.id+'"><span class="hx-ti hx-tag">'+esc((m.icon||'DOC').slice(0,3))+'</span><b>'+esc(m.name)+'</b><small>'+(m.header?m.header.length:0)+' fields</small></button>';
+      });
+      if(!tiles) tiles='<div class="ax-empty">No modules yet</div>';
+      ['axHomeMods','axAllMods'].forEach(function(id){
+        var el=document.getElementById(id); el.innerHTML=tiles;
+        el.querySelectorAll('[data-mod]').forEach(function(b){ b.onclick=function(){ pickModule(b.dataset.mod); }; });
+        el.querySelectorAll('[data-cn]').forEach(function(b){ b.onclick=function(){ go('creditnote'); }; });
+      });
     }
     // open Scan with this module selected
     function pickModule(id){
@@ -186,7 +195,7 @@
     async function loadHome(){
       try{
         var d=await (await fetch(window.apiUrl('api/stats.php'))).json(); if(!d||!d.ok) return;
-        count('axS1',d.scans_today); count('axS2',d.cn_month); count('axS3',d.cn_pending); count('axS4',d.modules);
+        count('axS1',d.scans_today); count('axS2',d.cn_month); count('axS3',d.cn_pending);
         var box=document.getElementById('axRecent');
         if(d.recent&&d.recent.length){
           box.innerHTML=d.recent.map(function(r){
